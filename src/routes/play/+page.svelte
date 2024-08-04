@@ -1,6 +1,6 @@
 <script lang="ts">
   import { supabase } from "$lib/supabaseClient";
-  import { RealtimeChannel, type RealtimePostgresChangesPayload } from "@supabase/supabase-js";
+  import { RealtimeChannel, type RealtimePostgresChangesPayload, type RealtimePostgresInsertPayload, type RealtimePostgresUpdatePayload } from "@supabase/supabase-js";
   import { onDestroy } from "svelte";
 
   import { player, opponents, session } from "$lib/stores";
@@ -31,12 +31,16 @@
     }
   }
 
-  const handlePlayerChanges = async (payload: RealtimePostgresChangesPayload<Player>) => {
-    if (payload.eventType === 'INSERT') {
-      if ( payload.new.id === $player.id ) return;
+  const handlePlayerInserts = async (payload: RealtimePostgresInsertPayload<Player>) => {
+    if ( payload.new.id === $player.id ) return;
 
-      $opponents = [...$opponents, payload.new];
-    }
+    $opponents = [...$opponents, payload.new];
+  }
+
+  const handlePlayerUpdates = async (payload: RealtimePostgresUpdatePayload<Player>) => {
+    if ( payload.new.id !== $player.id ) return;
+
+    $player = payload.new;
   }
 
   onDestroy(() => {
@@ -101,7 +105,8 @@
     
     playerSub = supabase
       .channel('players')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'players' }, handlePlayerChanges)
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'players' }, handlePlayerInserts)
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'players' }, handlePlayerUpdates)
       .subscribe();
 
     error = '';
@@ -121,6 +126,7 @@
   {#if $session && $player}
     <p>Logged in as {$player.name}</p>
     <p>Current Session: [{$session.id}] {$session.name}</p>
+    <p>Score: {$player.score}</p>
     {#if $session.state === "WAITING"}
       <p>Waiting for admin to start the game</p>
       <p>Opponents</p>
