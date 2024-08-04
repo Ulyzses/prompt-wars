@@ -1,6 +1,7 @@
 <script lang="ts">
   import { supabase } from "$lib/supabaseClient";
-  import { RealtimeChannel, type RealtimePostgresChangesPayload, type RealtimePostgresInsertPayload, type RealtimePostgresUpdatePayload } from "@supabase/supabase-js";
+  import type { RealtimePostgresInsertPayload, RealtimePostgresUpdatePayload } from "@supabase/supabase-js";
+  import { RealtimeChannel } from "@supabase/supabase-js";
   import { onDestroy } from "svelte";
 
   import { attacks, opponents, player, session } from "$lib/stores";
@@ -9,8 +10,8 @@
   import AttackBox from "$lib/components/AttackBox.svelte";
   import DefenceBox from "$lib/components/DefenceBox.svelte";
 
-  const handleSessionChanges = async (payload: RealtimePostgresChangesPayload<Session>) => {
-    if (payload.eventType !== 'UPDATE') return;
+  const handleSessionUpdates = async (payload: RealtimePostgresUpdatePayload<Session>) => {
+    if ( payload.new.id !== $session.id) return;
 
     $session = payload.new;
 
@@ -126,7 +127,7 @@
 
     sessionSub = supabase
       .channel('sessions')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'sessions' }, handleSessionChanges)
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'sessions' }, handleSessionUpdates)
       .subscribe();
     
     playerSub = supabase
