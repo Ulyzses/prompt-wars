@@ -185,32 +185,32 @@
 {#if error}
   <p>{error}</p>
 {/if}
-<form on:submit|preventDefault>
-  {#if $session && $player}
-    <p>Logged in as {$player.name}</p>
-    <p>Current Session: [{$session.id}] {$session.name}</p>
-    <p>Score: {$player.score}</p>
-    {#if $session.state === "WAITING"}
-      <p>Waiting for admin to start the game</p>
-      <p>Opponents</p>
-      {#each $opponents as opponent}
-        {opponent.name}
-      {/each}
-    {:else if $session.state === "DEFENDING"}
-      <p>Defending</p>
-      <DefenceBox bind:error previousPrompt={$player.def_prompt} />
-    {:else if $session.state === "ATTACKING"}
-      {#each $opponents as opponent}
-        <AttackBox {opponent} bind:error />
-      {/each}
-    {:else}
-      <p>Game has concluded</p>
-    {/if}
-    <h1>Logs</h1>
-    {#each $attacks as attack}
-      <p>{attack.attacker} ⚔️: "{attack.atk_prompt}"</p>
+{#if $session && $player}
+  <p>Logged in as {$player.name}</p>
+  <p>Current Session: [{$session.id}] {$session.name}</p>
+  <p>Score: {$player.score}</p>
+  {#if $session.state === "WAITING"}
+    <p>Waiting for admin to start the game</p>
+    <p>Opponents</p>
+    {#each $opponents as opponent}
+      {opponent.name}
+    {/each}
+  {:else if $session.state === "DEFENDING"}
+    <p>Defending</p>
+    <DefenceBox bind:error previousPrompt={$player.def_prompt} />
+  {:else if $session.state === "ATTACKING"}
+    {#each $opponents as opponent}
+      <AttackBox {opponent} bind:error />
     {/each}
   {:else}
+    <p>Game has concluded</p>
+  {/if}
+  <h1>Logs</h1>
+  {#each $attacks as attack}
+    <p>{attack.attacker} ⚔️: "{attack.atk_prompt}"</p>
+  {/each}
+{:else}
+  <form on:submit|preventDefault>
     <input type="text" name="name" placeholder="Name" bind:value={playerName} />
     <input
       type="number"
@@ -219,5 +219,5 @@
       bind:value={sessionId}
     />
     <button on:click|preventDefault={joinSession}>Join Session</button>
-  {/if}
-</form>
+  </form>
+{/if}

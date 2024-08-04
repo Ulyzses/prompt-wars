@@ -5,8 +5,22 @@
   export let opponent: Player;
   export let error: string;
 
+  async function setCooldown(s: number, step: number = 0.1) {
+    cooldown = 10;
+
+    const countDown = setInterval(() => {
+      if (cooldown <= 0) {
+        return clearInterval(countDown);
+      }
+
+      cooldown -= step;
+
+    }, step * 1000)
+  }
+
   async function sendAttack() {
     completion = "";
+    setCooldown(10);
 
     try {
       const response = await fetch("/api/chat", {
@@ -51,8 +65,11 @@
 
   let attack = "";
   let completion = "";
+  let cooldown = 0;
   let password = "";
   let status = "";
+
+  $: isDisabled = cooldown > 0;
 </script>
 
 <div>
@@ -63,7 +80,7 @@
     disabled
   ></textarea>
   <input type="text" name="attack" bind:value={attack} />
-  <button type="submit" on:click|preventDefault={sendAttack}>Submit</button>
+  <button type="submit" on:click|preventDefault={sendAttack} disabled={isDisabled}>Submit{isDisabled ? ` (in ${cooldown.toFixed(1)}s)`: ''}</button>
   <input type="text" name="password" bind:value={password} />
   <button type="submit" on:click|preventDefault={verifyPassword}>Verify</button>
   {#if status}
