@@ -1,6 +1,9 @@
 <script lang="ts">
   import { supabase } from "$lib/supabaseClient";
-  import type { RealtimePostgresInsertPayload, RealtimePostgresUpdatePayload } from "@supabase/supabase-js";
+  import type {
+    RealtimePostgresInsertPayload,
+    RealtimePostgresUpdatePayload,
+  } from "@supabase/supabase-js";
   import { RealtimeChannel } from "@supabase/supabase-js";
   import { onDestroy } from "svelte";
 
@@ -10,63 +13,71 @@
   import AttackBox from "$lib/components/AttackBox.svelte";
   import DefenceBox from "$lib/components/DefenceBox.svelte";
 
-  const handleSessionUpdates = async (payload: RealtimePostgresUpdatePayload<Session>) => {
-    if ( payload.new.id !== $session.id) return;
+  const handleSessionUpdates = async (
+    payload: RealtimePostgresUpdatePayload<Session>,
+  ) => {
+    if (payload.new.id !== $session.id) return;
 
     $session = payload.new;
 
-    if ( payload.new.state === "DEFENDING" ) {
+    if (payload.new.state === "DEFENDING") {
       const password = generate({ minLength: 3, maxLength: 6 }) as string;
 
       const playerQuery = await supabase
-        .from('players')
+        .from("players")
         .update({ password })
-        .eq('id', $player.id);
-      
-      if ( playerQuery.error ) {
+        .eq("id", $player.id);
+
+      if (playerQuery.error) {
         const { code, message } = playerQuery.error;
         error = `ERROR ${code}: ${message}`;
         return console.error(playerQuery.error);
       }
     }
-  }
+  };
 
-  const handlePlayerInserts = async (payload: RealtimePostgresInsertPayload<Player>) => {
-    if ( payload.new.id === $player.id ) return;
+  const handlePlayerInserts = async (
+    payload: RealtimePostgresInsertPayload<Player>,
+  ) => {
+    if (payload.new.id === $player.id) return;
 
     $opponents = [...$opponents, payload.new];
-  }
+  };
 
-  const handlePlayerUpdates = async (payload: RealtimePostgresUpdatePayload<Player>) => {
-    if ( payload.new.id !== $player.id ) return;
+  const handlePlayerUpdates = async (
+    payload: RealtimePostgresUpdatePayload<Player>,
+  ) => {
+    if (payload.new.id !== $player.id) return;
 
     $player = payload.new;
-  }
+  };
 
-  const handleAttackInserts = async (payload: RealtimePostgresInsertPayload<Attack>) => {
-    if ( payload.new.defender !== $player.id ) return;
+  const handleAttackInserts = async (
+    payload: RealtimePostgresInsertPayload<Attack>,
+  ) => {
+    if (payload.new.defender !== $player.id) return;
 
     $attacks = [...$attacks, payload.new];
-  }
+  };
 
   onDestroy(() => {
     playerSub?.unsubscribe();
     sessionSub?.unsubscribe();
     attackSub?.unsubscribe();
-  })
+  });
 
   /* Admin action handlers */
 
   async function joinSession() {
     /* Retrieve session */
     const sessionQuery = await supabase
-      .from('sessions')
+      .from("sessions")
       .select()
       .eq("id", sessionId)
       .limit(1)
       .single();
-    
-    if ( sessionQuery.error ) {
+
+    if (sessionQuery.error) {
       const { code, message } = sessionQuery.error;
       error = `ERROR ${code}: ${message}`;
       return console.error(sessionQuery.error);
@@ -76,31 +87,34 @@
 
     /* Retrieve player */
     const playerQuery = await supabase
-      .from('players')
-      .upsert({
-        session: $session.id,
-        name: playerName,
-      }, { onConflict: 'session, name' })
+      .from("players")
+      .upsert(
+        {
+          session: $session.id,
+          name: playerName,
+        },
+        { onConflict: "session, name" },
+      )
       .select()
       .limit(1)
       .single();
-    
-    if ( playerQuery.error ) {
+
+    if (playerQuery.error) {
       const { code, message } = playerQuery.error;
       error = `ERROR ${code}: ${message}`;
       return console.error(playerQuery.error);
     }
 
     $player = playerQuery.data;
-    
+
     /* Retrieve opponents */
     const opponentQuery = await supabase
-      .from('players')
+      .from("players")
       .select()
-      .eq('session', $session.id)
-      .neq('id', $player.id);
-    
-    if ( opponentQuery.error ) {
+      .eq("session", $session.id)
+      .neq("id", $player.id);
+
+    if (opponentQuery.error) {
       const { code, message } = opponentQuery.error;
       error = `ERROR ${code}: ${message}`;
       return console.error(opponentQuery.error);
@@ -110,12 +124,12 @@
 
     /* Retrieve attacks */
     const attackQuery = await supabase
-      .from('attacks')
+      .from("attacks")
       .select()
-      .eq('session', $session.id)
-      .eq('defender', $player.id);
-    
-    if ( attackQuery.error ) {
+      .eq("session", $session.id)
+      .eq("defender", $player.id);
+
+    if (attackQuery.error) {
       const { code, message } = attackQuery.error;
       error = `ERROR ${code}: ${message}`;
       return console.error(attackQuery.error);
@@ -126,32 +140,48 @@
     /* Subscribers */
 
     sessionSub = supabase
-      .channel('sessions')
-      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'sessions' }, handleSessionUpdates)
+      .channel("sessions")
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "sessions" },
+        handleSessionUpdates,
+      )
       .subscribe();
-    
+
     playerSub = supabase
-      .channel('players')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'players' }, handlePlayerInserts)
-      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'players' }, handlePlayerUpdates)
+      .channel("players")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "players" },
+        handlePlayerInserts,
+      )
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "players" },
+        handlePlayerUpdates,
+      )
       .subscribe();
 
     attackSub = supabase
-      .channel('attacks')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'attacks' }, handleAttackInserts)
+      .channel("attacks")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "attacks" },
+        handleAttackInserts,
+      )
       .subscribe();
 
-    error = '';
+    error = "";
   }
-  
+
   let attackSub: RealtimeChannel;
   let playerSub: RealtimeChannel;
   let sessionSub: RealtimeChannel;
-  let error: string = '';
-  let playerName: string = '';
+  let error: string = "";
+  let playerName: string = "";
   let sessionId: number = 0;
-  
 </script>
+
 {#if error}
   <p>{error}</p>
 {/if}
@@ -168,10 +198,10 @@
       {/each}
     {:else if $session.state === "DEFENDING"}
       <p>Defending</p>
-      <DefenceBox bind:error={error} previousPrompt={$player.def_prompt} />
+      <DefenceBox bind:error previousPrompt={$player.def_prompt} />
     {:else if $session.state === "ATTACKING"}
       {#each $opponents as opponent}
-        <AttackBox {opponent} bind:error={error} />
+        <AttackBox {opponent} bind:error />
       {/each}
     {:else}
       <p>Game has concluded</p>
@@ -181,8 +211,13 @@
       <p>{attack.attacker} ⚔️: "{attack.atk_prompt}"</p>
     {/each}
   {:else}
-    <input type="text" name="name" placeholder="Name" bind:value={playerName}>
-    <input type="number" name="sessionId" placeholder="Session ID" bind:value={sessionId}>
+    <input type="text" name="name" placeholder="Name" bind:value={playerName} />
+    <input
+      type="number"
+      name="sessionId"
+      placeholder="Session ID"
+      bind:value={sessionId}
+    />
     <button on:click|preventDefault={joinSession}>Join Session</button>
   {/if}
 </form>
