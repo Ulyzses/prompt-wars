@@ -14,8 +14,7 @@
       }
 
       cooldown -= step;
-
-    }, step * 1000)
+    }, step * 1000);
   }
 
   async function sendAttack() {
@@ -80,7 +79,12 @@
     disabled
   ></textarea>
   <input type="text" name="attack" bind:value={attack} />
-  <button type="submit" on:click|preventDefault={sendAttack} disabled={isDisabled}>Submit{isDisabled ? ` (in ${cooldown.toFixed(1)}s)`: ''}</button>
+  <button
+    type="submit"
+    on:click|preventDefault={sendAttack}
+    disabled={isDisabled}
+    >Submit{isDisabled ? ` (in ${cooldown.toFixed(1)}s)` : ""}</button
+  >
   <input type="text" name="password" bind:value={password} />
   <button type="submit" on:click|preventDefault={verifyPassword}>Verify</button>
   {#if status}

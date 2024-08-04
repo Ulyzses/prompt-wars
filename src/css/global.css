@@ -1,0 +1,61 @@
+@import url("https://fonts.googleapis.com/css2?family=Aleo:ital,wght@0,100..900;1,100..900&family=IBM+Plex+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap");
+
+:root {
+  --CURSOR-green: #10743c;
+  --CURSOR-black: #161616;
+  --CURSOR-white: #f4f4f4;
+
+  --callout-success: #e8f2f0;
+  --callout-info: #fff8de;
+  --callout-warn: #f7e1d3;
+  --callout-alert: #f5d2d3;
+  --callout-idk: #e8dbf5;
+
+  --font-xs: 9px;
+  --font-s: 12px;
+  --font-m: 16px;
+
+  --space-xs: 4px;
+  --space-s: 8px;
+  --space-m: 12px;
+  --space-l: 16px;
+  --space-xl: 24px;
+
+  --width-xs: 256px;
+  --width-s: 512px;
+  --width-m: 1024px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+div.main-container {
+  width: 100vw;
+  height: 100vh;
+
+  background-color: var(--CURSOR-white);
+}
+
+h1,
+h2,
+h3 {
+  font-family: "Aleo";
+}
+
+input,
+p {
+  font-family: "IBM Plex Sans";
+}
+
+.no-spinners {
+  -moz-appearance: textfield;
+}
+
+.no-spinners::-webkit-outer-spin-button,
+.no-spinners::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}

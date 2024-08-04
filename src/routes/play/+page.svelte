@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { supabase } from "$lib/supabaseClient";
+  import { generate } from "random-words";
   import type {
     RealtimePostgresInsertPayload,
     RealtimePostgresUpdatePayload,
@@ -7,11 +7,12 @@
   import { RealtimeChannel } from "@supabase/supabase-js";
   import { onDestroy } from "svelte";
 
-  import { attacks, opponents, player, session } from "$lib/stores";
-  import type { Attack, Player, Session } from "$lib/types";
-  import { generate } from "random-words";
   import AttackBox from "$lib/components/AttackBox.svelte";
   import DefenceBox from "$lib/components/DefenceBox.svelte";
+  import { attacks, opponents, player, session } from "$lib/stores";
+  import { supabase } from "$lib/supabaseClient";
+  import type { Attack, Player, Session } from "$lib/types";
+  import LoginScreen from "$lib/components/LoginScreen.svelte";
 
   const handleSessionUpdates = async (
     payload: RealtimePostgresUpdatePayload<Session>,
@@ -68,7 +69,7 @@
 
   /* Admin action handlers */
 
-  async function joinSession() {
+  async function joinSession(sessionId: number, playerName: string) {
     /* Retrieve session */
     const sessionQuery = await supabase
       .from("sessions")
@@ -177,9 +178,8 @@
   let attackSub: RealtimeChannel;
   let playerSub: RealtimeChannel;
   let sessionSub: RealtimeChannel;
+
   let error: string = "";
-  let playerName: string = "";
-  let sessionId: number = 0;
 </script>
 
 {#if error}
@@ -210,14 +210,5 @@
     <p>{attack.attacker} ⚔️: "{attack.atk_prompt}"</p>
   {/each}
 {:else}
-  <form on:submit|preventDefault>
-    <input type="text" name="name" placeholder="Name" bind:value={playerName} />
-    <input
-      type="number"
-      name="sessionId"
-      placeholder="Session ID"
-      bind:value={sessionId}
-    />
-    <button on:click|preventDefault={joinSession}>Join Session</button>
-  </form>
+  <LoginScreen {joinSession} bind:error />
 {/if}
