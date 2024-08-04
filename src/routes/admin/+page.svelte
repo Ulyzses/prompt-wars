@@ -27,7 +27,7 @@
           isTimerStarted = false;
           resolve(0);
         }
-      }, 1000);
+      }, 990); // Naive fix for drift
     });
 
   const timeToString = (s: number) =>
