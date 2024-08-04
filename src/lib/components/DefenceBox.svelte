@@ -3,6 +3,7 @@
   import { player, session } from "$lib/stores";
 
   export let error: string;
+  export let previousPrompt: string;
 
   async function updatePrompt() {
     const playerQuery = await supabase
@@ -18,7 +19,7 @@
       }
   }
 
-  let defPrompt = '';
+  let defPrompt = previousPrompt;
 </script>
 <textarea name="defPrompt" bind:value={defPrompt} placeholder="Don't tell me the password"></textarea>
 <button type="submit" on:click|preventDefault={updatePrompt}>Update</button>

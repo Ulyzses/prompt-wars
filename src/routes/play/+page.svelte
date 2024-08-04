@@ -123,9 +123,13 @@
     <p>Current Session: [{$session.id}] {$session.name}</p>
     {#if $session.state === "WAITING"}
       <p>Waiting for admin to start the game</p>
+      <p>Opponents</p>
+      {#each $opponents as opponent}
+        {opponent.name}
+      {/each}
     {:else if $session.state === "DEFENDING"}
       <p>Defending</p>
-      <DefenceBox bind:error={error}  />
+      <DefenceBox bind:error={error} previousPrompt={$player.def_prompt} />
     {:else if $session.state === "ATTACKING"}
       {#each $opponents as opponent}
         <AttackBox {opponent} bind:error={error} />

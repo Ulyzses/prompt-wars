@@ -41,9 +41,7 @@
       const data = await response.json();
       const { correct } = data;
 
-      if ( correct ) {
-        status = `You got the password: ${password}`;
-      }
+      status = correct ? `You got the password: ${password}` : `The submitted password is wrong`;
     } catch (e) {
       error = e as string;
     }
