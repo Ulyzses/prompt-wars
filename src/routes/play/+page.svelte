@@ -3,8 +3,8 @@
   import { RealtimeChannel, type RealtimePostgresChangesPayload, type RealtimePostgresInsertPayload, type RealtimePostgresUpdatePayload } from "@supabase/supabase-js";
   import { onDestroy } from "svelte";
 
-  import { player, opponents, session } from "$lib/stores";
-  import type { Player, Session } from "$lib/types";
+  import { attacks, opponents, player, session } from "$lib/stores";
+  import type { Attack, Player, Session } from "$lib/types";
   import { generate } from "random-words";
   import AttackBox from "$lib/components/AttackBox.svelte";
   import DefenceBox from "$lib/components/DefenceBox.svelte";
@@ -20,8 +20,7 @@
       const playerQuery = await supabase
         .from('players')
         .update({ password })
-        .eq('id', $player.id)
-        .eq('session', $session.id);
+        .eq('id', $player.id);
       
       if ( playerQuery.error ) {
         const { code, message } = playerQuery.error;
@@ -43,14 +42,22 @@
     $player = payload.new;
   }
 
+  const handleAttackInserts = async (payload: RealtimePostgresInsertPayload<Attack>) => {
+    if ( payload.new.defender !== $player.id ) return;
+
+    $attacks = [...$attacks, payload.new];
+  }
+
   onDestroy(() => {
     playerSub?.unsubscribe();
     sessionSub?.unsubscribe();
+    attackSub?.unsubscribe();
   })
 
   /* Admin action handlers */
 
   async function joinSession() {
+    /* Retrieve session */
     const sessionQuery = await supabase
       .from('sessions')
       .select()
@@ -66,6 +73,7 @@
 
     $session = sessionQuery.data;
 
+    /* Retrieve player */
     const playerQuery = await supabase
       .from('players')
       .upsert({
@@ -84,6 +92,7 @@
 
     $player = playerQuery.data;
     
+    /* Retrieve opponents */
     const opponentQuery = await supabase
       .from('players')
       .select()
@@ -98,6 +107,23 @@
 
     $opponents = opponentQuery.data;
 
+    /* Retrieve attacks */
+    const attackQuery = await supabase
+      .from('attacks')
+      .select()
+      .eq('session', $session.id)
+      .eq('defender', $player.id);
+    
+    if ( attackQuery.error ) {
+      const { code, message } = attackQuery.error;
+      error = `ERROR ${code}: ${message}`;
+      return console.error(attackQuery.error);
+    }
+
+    $attacks = attackQuery.data;
+
+    /* Subscribers */
+
     sessionSub = supabase
       .channel('sessions')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'sessions' }, handleSessionChanges)
@@ -109,9 +135,15 @@
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'players' }, handlePlayerUpdates)
       .subscribe();
 
+    attackSub = supabase
+      .channel('attacks')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'attacks' }, handleAttackInserts)
+      .subscribe();
+
     error = '';
   }
   
+  let attackSub: RealtimeChannel;
   let playerSub: RealtimeChannel;
   let sessionSub: RealtimeChannel;
   let error: string = '';
@@ -143,6 +175,10 @@
     {:else}
       <p>Game has concluded</p>
     {/if}
+    <h1>Logs</h1>
+    {#each $attacks as attack}
+      <p>{attack.attacker} ⚔️: "{attack.atk_prompt}"</p>
+    {/each}
   {:else}
     <input type="text" name="name" placeholder="Name" bind:value={playerName}>
     <input type="number" name="sessionId" placeholder="Session ID" bind:value={sessionId}>
