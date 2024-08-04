@@ -67,6 +67,61 @@ export type Database = {
           },
         ]
       }
+      breaks: {
+        Row: {
+          attacker: number | null
+          created_at: string
+          defender: number | null
+          id: number
+          password: string | null
+          round: number | null
+          score_change: number
+          session: number | null
+        }
+        Insert: {
+          attacker?: number | null
+          created_at?: string
+          defender?: number | null
+          id?: number
+          password?: string | null
+          round?: number | null
+          score_change?: number
+          session?: number | null
+        }
+        Update: {
+          attacker?: number | null
+          created_at?: string
+          defender?: number | null
+          id?: number
+          password?: string | null
+          round?: number | null
+          score_change?: number
+          session?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "breaks_attacker_fkey"
+            columns: ["attacker"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "breaks_defender_fkey"
+            columns: ["defender"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "breaks_session_fkey"
+            columns: ["session"]
+            isOneToOne: false
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       players: {
         Row: {
           created_at: string
@@ -137,7 +192,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      update_score: {
+        Args: {
+          val: number
+          player_id: number
+        }
+        Returns: number
+      }
     }
     Enums: {
       GameState: "WAITING" | "DEFENDING" | "ATTACKING" | "CONCLUDED"
