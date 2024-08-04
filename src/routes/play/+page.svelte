@@ -6,7 +6,7 @@
   import { player, opponents, session } from "$lib/stores";
   import type { Player, Session } from "$lib/types";
   import { generate } from "random-words";
-  import Chatbox from "$lib/components/Chatbox.svelte";
+  import AttackBox from "$lib/components/AttackBox.svelte";
   import DefenceBox from "$lib/components/DefenceBox.svelte";
 
   const handleSessionChanges = async (payload: RealtimePostgresChangesPayload<Session>) => {
@@ -128,7 +128,7 @@
       <DefenceBox bind:error={error}  />
     {:else if $session.state === "ATTACKING"}
       {#each $opponents as opponent}
-        <Chatbox {opponent} bind:error={error} />
+        <AttackBox {opponent} bind:error={error} />
       {/each}
     {:else}
       <p>Game has concluded</p>

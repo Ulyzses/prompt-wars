@@ -6,11 +6,13 @@
   export let error: string;
 
   async function sendAttack() {
+    completion = '';
+    
     try {
       const response = await fetch('/api/chat', {
         method: 'POST',
         body: JSON.stringify({
-          session: $session.id,
+          session: $session,
           attacker: $player.id,
           defender: opponent.id,
           prompt: attack
@@ -24,12 +26,42 @@
     }
   }
 
+  async function verifyPassword() {
+    try {
+      const response = await fetch('/api/verify', {
+        method: 'POST',
+        body: JSON.stringify({
+          session: $session,
+          attacker: $player.id,
+          defender: opponent.id,
+          password,
+        }), 
+      });
+
+      const data = await response.json();
+      const { correct } = data;
+
+      if ( correct ) {
+        status = `You got the password: ${password}`;
+      }
+    } catch (e) {
+      error = e as string;
+    }
+  }
+
   let attack = '';
   let completion = '';
+  let password = '';
+  let status = '';
 </script>
 <div>
   {opponent.name}
   <textarea placeholder="Chat completions go here" bind:value={completion} disabled></textarea>
   <input type="text" name="attack" bind:value={attack}>
   <button type="submit" on:click|preventDefault={sendAttack}>Submit</button>
+  <input type="text" name="password" bind:value={password}>
+  <button type="submit" on:click|preventDefault={verifyPassword}>Verify</button>
+  {#if status}
+    <p>{status}</p>
+  {/if}
 </div>

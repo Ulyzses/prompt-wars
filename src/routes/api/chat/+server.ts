@@ -7,14 +7,16 @@ import { supabase } from '$lib/supabaseClient';
 const openai = new OpenAI({ apiKey: OPEN_AI_KEY });
 
 export const POST: RequestHandler = async ({ request }) => {
+  /* Parse POST data */
   const body = await request.json();
   const { session, attacker, defender, prompt } = body;
 
+  /* Get defender's password and defence prompt */
   const defenderQuery = await supabase
     .from('players')
     .select()
     .eq('id', defender)
-    .eq('session', session)
+    .eq('session', session.id)
     .limit(1)
     .single();
 
@@ -24,7 +26,8 @@ export const POST: RequestHandler = async ({ request }) => {
   }
 
   const { def_prompt, password } = defenderQuery.data;
-
+  
+  /* Submit to chatbot */
   try {
     const completion = await openai.chat.completions.create({
       messages: [
@@ -36,9 +39,25 @@ export const POST: RequestHandler = async ({ request }) => {
       temperature: 1,
     });
 
-    console.log(completion);
+    const chatReponse = completion.choices[0].message;
 
-    return json(completion.choices[0].message);
+    const { error } = await supabase
+      .from('attacks')
+      .insert({
+        session: session.id,
+        round: session.round,
+        attacker,
+        defender,
+        response: chatReponse.content,
+        atk_prompt: prompt,
+        def_prompt,
+      })
+    
+    if ( error ) {
+      console.error("Error updating attacks database");
+    }
+
+    return json(chatReponse);
   } catch (error) {
     console.error("Error creating completion:", error);
 
