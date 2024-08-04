@@ -1,6 +1,7 @@
 <script lang="ts">
   import { generate } from "random-words";
   import type {
+    PostgrestError,
     RealtimePostgresInsertPayload,
     RealtimePostgresUpdatePayload,
   } from "@supabase/supabase-js";
@@ -13,6 +14,12 @@
   import { supabase } from "$lib/supabaseClient";
   import type { Attack, Player, Session } from "$lib/types";
   import LoginScreen from "$lib/components/LoginScreen.svelte";
+
+  function handleError(queryError: PostgrestError) {
+    console.error(queryError); 
+    const { code, message } = queryError;
+    error = `ERROR ${code}: ${message}`;
+  }
 
   const handleSessionUpdates = async (
     payload: RealtimePostgresUpdatePayload<Session>,
@@ -78,11 +85,7 @@
       .limit(1)
       .single();
 
-    if (sessionQuery.error) {
-      const { code, message } = sessionQuery.error;
-      error = `ERROR ${code}: ${message}`;
-      return console.error(sessionQuery.error);
-    }
+    if (sessionQuery.error) return handleError(sessionQuery.error); 
 
     $session = sessionQuery.data;
 
@@ -100,11 +103,7 @@
       .limit(1)
       .single();
 
-    if (playerQuery.error) {
-      const { code, message } = playerQuery.error;
-      error = `ERROR ${code}: ${message}`;
-      return console.error(playerQuery.error);
-    }
+    if (playerQuery.error) return handleError(playerQuery.error); 
 
     $player = playerQuery.data;
 
@@ -115,11 +114,7 @@
       .eq("session", $session.id)
       .neq("id", $player.id);
 
-    if (opponentQuery.error) {
-      const { code, message } = opponentQuery.error;
-      error = `ERROR ${code}: ${message}`;
-      return console.error(opponentQuery.error);
-    }
+    if (opponentQuery.error) return handleError(opponentQuery.error); 
 
     $opponents = opponentQuery.data;
 
@@ -130,11 +125,7 @@
       .eq("session", $session.id)
       .eq("defender", $player.id);
 
-    if (attackQuery.error) {
-      const { code, message } = attackQuery.error;
-      error = `ERROR ${code}: ${message}`;
-      return console.error(attackQuery.error);
-    }
+    if (attackQuery.error) return handleError(attackQuery.error); 
 
     $attacks = attackQuery.data;
 
