@@ -50,9 +50,18 @@
   const handlePlayerUpdates = async (
     payload: RealtimePostgresUpdatePayload<Player>,
   ) => {
-    if (payload.new.id !== $player.id) return;
+    if (payload.new.id === $player.id) {
+      $player = payload.new;
+    } else {
+      const idx = $opponents.findIndex((player) => player.id === payload.new.id);
 
-    $player = payload.new;
+      if (idx >= 0) {
+        $opponents[idx] = payload.new;
+        $opponents = $opponents;
+      } else {
+        $opponents = [...$opponents, payload.new];
+      }
+    }
   };
 
   const handleAttackInserts = async (
