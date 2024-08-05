@@ -8,12 +8,11 @@
   import { RealtimeChannel } from "@supabase/supabase-js";
   import { onDestroy } from "svelte";
 
-  import AttackBox from "$lib/components/AttackBox.svelte";
-  import DefenceBox from "$lib/components/DefenceBox.svelte";
+  import LoginScreen from "$lib/components/LoginScreen.svelte";
   import { attacks, opponents, player, session } from "$lib/stores";
   import { supabase } from "$lib/supabaseClient";
   import type { Attack, Player, Session } from "$lib/types";
-  import LoginScreen from "$lib/components/LoginScreen.svelte";
+  import GameScreen from "$lib/components/GameScreen.svelte";
 
   function handleError(queryError: PostgrestError) {
     console.error(queryError); 
@@ -173,29 +172,7 @@
   <p>{error}</p>
 {/if}
 {#if $session && $player}
-  <p>Logged in as {$player.name}</p>
-  <p>Current Session: [{$session.id}] {$session.name}</p>
-  <p>Score: {$player.score}</p>
-  {#if $session.state === "WAITING"}
-    <p>Waiting for admin to start the game</p>
-    <p>Opponents</p>
-    {#each $opponents as opponent}
-      {opponent.name}
-    {/each}
-  {:else if $session.state === "DEFENDING"}
-    <p>Defending</p>
-    <DefenceBox bind:error previousPrompt={$player.def_prompt} />
-  {:else if $session.state === "ATTACKING"}
-    {#each $opponents as opponent}
-      <AttackBox {opponent} bind:error />
-    {/each}
-  {:else}
-    <p>Game has concluded</p>
-  {/if}
-  <h1>Logs</h1>
-  {#each $attacks as attack}
-    <p>{attack.attacker} ⚔️: "{attack.atk_prompt}"</p>
-  {/each}
+  <GameScreen bind:error />
 {:else}
   <LoginScreen {joinSession} bind:error />
 {/if}

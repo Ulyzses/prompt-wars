@@ -71,23 +71,40 @@
   $: isDisabled = cooldown > 0;
 </script>
 
-<div>
-  {opponent.name}
+<div class="card">
+  <h3>{opponent.name}</h3>
   <textarea
     placeholder="Chat completions go here"
     bind:value={completion}
     disabled
+    rows="10"
+    cols="30"
   ></textarea>
-  <input type="text" name="attack" bind:value={attack} />
+  <textarea
+    placeholder="Attack here"
+    name="attack" 
+    rows="10"
+    cols="30"
+    bind:value={attack}
+  ></textarea>
   <button
     type="submit"
     on:click|preventDefault={sendAttack}
     disabled={isDisabled}
-    >Submit{isDisabled ? ` (in ${cooldown.toFixed(1)}s)` : ""}</button
+    >Submit Prompt{isDisabled ? ` (in ${cooldown.toFixed(1)}s)` : ""}</button
   >
-  <input type="text" name="password" bind:value={password} />
+  <input type="text" placeholder="Password" name="password" bind:value={password} />
   <button type="submit" on:click|preventDefault={verifyPassword}>Verify</button>
   {#if status}
     <p>{status}</p>
   {/if}
 </div>
+<style>
+  .card {
+    background-color: white;
+    border-radius: var(--space-s);
+    box-shadow: #ddd 0 0 var(--space-m);
+    margin: var(--space-s);
+    padding: var(--space-s);
+  }
+</style>

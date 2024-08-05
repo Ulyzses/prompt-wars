@@ -60,9 +60,9 @@
   }
 
   .form-control {
-    margin-bottom: var(--space-s);
-    max-width: var(--width-xs);
-    padding: var(--space-s);
+    margin-bottom: var(--space-xs);
+    max-width: var(--width-xxs);
+    padding: var(--space-xs);
     text-align: center;
     width: 100%;
   }

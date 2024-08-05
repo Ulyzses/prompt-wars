@@ -15,11 +15,13 @@
   --font-s: 12px;
   --font-m: 16px;
 
-  --space-xs: 4px;
-  --space-s: 8px;
-  --space-m: 12px;
-  --space-l: 16px;
-  --space-xl: 24px;
+  --space-xxs: 4px;
+  --space-xs: 8px;
+  --space-s: 12px;
+  --space-m: 16px;
+  --space-l: 24px;
+  --space-xl: 32px;
+  --space-xxl: 64px;
 
   --width-xs: 256px;
   --width-s: 512px;
@@ -46,7 +48,8 @@ h3 {
 }
 
 input,
-p {
+p,
+span {
   font-family: "IBM Plex Sans";
 }
 
