@@ -35,12 +35,8 @@
         .from("players")
         .update({ password })
         .eq("id", $player.id);
-
-      if (playerQuery.error) {
-        const { code, message } = playerQuery.error;
-        error = `ERROR ${code}: ${message}`;
-        return console.error(playerQuery.error);
-      }
+      
+      if (playerQuery.error) return handleError(playerQuery.error);
     }
   };
 
