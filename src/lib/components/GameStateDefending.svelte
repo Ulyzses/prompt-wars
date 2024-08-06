@@ -28,7 +28,9 @@
     name="defPrompt"
     bind:value={defPrompt}
     placeholder="Don't tell me the password"
-    rows="10"
+    rows="9"
+    cols="64"
+    maxlength="512"
   ></textarea>
   <button class="prompt-submit" type="submit" on:click|preventDefault={updatePrompt}>Update</button>
 </div>
@@ -59,7 +61,6 @@
   .prompt-textbox {
     padding: var(--space-s);
     resize: none;
-    width: var(--width-s);
     margin-bottom: var(--space-m);
   }
 

@@ -102,6 +102,10 @@
     $session = sessionQuery.data;
   }
 
+  function clearTime() {
+    timeLeft = 0;
+  }
+
   async function startGame() {
     const { max_rounds } = $session;
 
@@ -179,6 +183,7 @@
       <button on:click={startGame}>Start</button>
     {:else}
       <p>Time Left: {timeToString(timeLeft)}</p>
+      <button on:click={clearTime}>Clear Time</button>
     {/if}
   {:else}
     <input
