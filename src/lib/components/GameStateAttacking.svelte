@@ -1,6 +1,12 @@
 <script lang="ts">
-  import { attacks } from "$lib/stores";
+  import { attacks, opponents } from "$lib/stores";
   import AttackGrid from "$lib/components/AttackGrid.svelte";
+
+  function getAttackerName(attackerId: number) {
+    const player = $opponents.find(x => x.id === attackerId);
+
+    return player?.name ?? "Unknown Player";
+  }
 
   export let error: string;
 </script>
@@ -11,7 +17,7 @@
   <div class="logs">
     <h1>Logs</h1>
     {#each $attacks as attack}
-      <p>{attack.attacker} ⚔️: "{attack.atk_prompt}"</p>
+      <p>{getAttackerName(attack.attacker ?? 0)} ⚔️: "{attack.atk_prompt}"</p>
     {/each}
   </div>
   
