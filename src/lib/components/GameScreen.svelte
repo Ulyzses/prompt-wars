@@ -1,11 +1,11 @@
 <script lang="ts">
-  import AttackBox from "$lib/components/AttackBox.svelte";
   import GameHeader from "$lib/components/GameHeader.svelte";
+  import GameStateAttacking from "$lib/components/GameStateAttacking.svelte";
   import GameStateConcluded from "$lib/components/GameStateConcluded.svelte";
+  import GameStateDefending from "$lib/components/GameStateDefending.svelte";
+  import GameStateWaiting from "$lib/components/GameStateWaiting.svelte";
 
-  import { attacks, opponents, session } from "$lib/stores";
-  import GameStateAttacking from "./GameStateAttacking.svelte";
-  import GameStateDefending from "./GameStateDefending.svelte";
+  import { opponents, session } from "$lib/stores";
 
   export let error: string;
 </script>
@@ -13,11 +13,7 @@
   <GameHeader />
   <div class="game-body">
     {#if $session.state === "WAITING"}
-      <p>Waiting for admin to start the game</p>
-      <p>Opponents</p>
-      {#each $opponents as opponent}
-        {opponent.name}
-      {/each}
+      <GameStateWaiting />
     {:else if $session.state === "DEFENDING"}
       <GameStateDefending bind:error />
     {:else if $session.state === "ATTACKING"}
