@@ -72,31 +72,37 @@
 </script>
 
 <div class="card">
-  <h3>{opponent.name}</h3>
-  <textarea
-    placeholder="Chat completions go here"
-    bind:value={completion}
-    disabled
-    rows="10"
-    cols="30"
-  ></textarea>
-  <textarea
-    placeholder="Attack here"
-    name="attack" 
-    rows="10"
-    cols="30"
-    bind:value={attack}
-  ></textarea>
-  <button
-    type="submit"
-    on:click|preventDefault={sendAttack}
-    disabled={isDisabled}
-    >Submit Prompt{isDisabled ? ` (in ${cooldown.toFixed(1)}s)` : ""}</button
-  >
-  <input type="text" placeholder="Password" name="password" bind:value={password} />
-  <button type="submit" on:click|preventDefault={verifyPassword}>Verify</button>
-  {#if status}
-    <p>{status}</p>
+  {#if opponent}
+    <h3>{opponent.name}</h3>
+    <textarea
+      placeholder="Chat completions go here"
+      id="completion"
+      rows="3"
+      bind:value={completion}
+      disabled
+    ></textarea>
+    <div class="section-prompt">
+      <textarea
+      placeholder="Attack here"
+      id="prompt"
+      name="attack" 
+      rows="3"
+      bind:value={attack}
+      ></textarea>
+      <button
+        type="submit"
+        on:click|preventDefault={sendAttack}
+        disabled={isDisabled}
+        >Submit Prompt{isDisabled ? ` (in ${cooldown.toFixed(1)}s)` : ""}</button
+      >
+    </div>
+    <div class="section-password">
+      <input type="text" placeholder="Password" name="password" bind:value={password} />
+      <button type="submit" on:click|preventDefault={verifyPassword}>Verify</button>
+    </div>
+    {#if status}
+      <p>{status}</p>
+    {/if}
   {/if}
 </div>
 <style>
@@ -104,7 +110,21 @@
     background-color: white;
     border-radius: var(--space-s);
     box-shadow: #ddd 0 0 var(--space-m);
-    margin: var(--space-s);
     padding: var(--space-s);
+    max-width: 100%;
+  }
+
+  .section-prompt {
+    width: 100%;
+  }
+
+  textarea {
+    padding: var(--space-xs);
+    resize: none;
+  }
+  
+  #completion {
+    background-color: var(--CURSOR-white);
+    width: 100%;
   }
 </style>
