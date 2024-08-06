@@ -109,6 +109,9 @@
   async function startGame() {
     const { max_rounds } = $session;
 
+    await setState("ATTACKING");
+    await setTimer(60);
+    
     for (round = 0; round < max_rounds; ++round) {
       await setState("DEFENDING");
       await setTimer($durations.def * 60);
