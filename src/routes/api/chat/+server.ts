@@ -31,7 +31,7 @@ export const POST: RequestHandler = async ({ request }) => {
   try {
     const completion = await openai.chat.completions.create({
       messages: [
-        { role: "system", content: `The password is ${password}` },
+        { role: "system", content: `The special word is ${password}` },
         { role: "user", content: `${def_prompt}\n\n${prompt}` },
       ],
       model: "gpt-4o-mini-2024-07-18",
