@@ -52,7 +52,8 @@ input,
 label,
 p,
 span,
-textarea {
+textarea,
+td, th {
   font-family: "IBM Plex Sans";
 }
 
