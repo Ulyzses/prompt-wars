@@ -20,6 +20,7 @@
     justify-content: space-between;
     padding: var(--space-l);
     width: 100vw;
+    overflow: hidden;
   }
 
   .game-nav > .right {

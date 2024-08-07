@@ -32,11 +32,12 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  overflow-x: hidden;
 }
 
 div.main-container {
   width: 100vw;
-  height: 100vh;
+  min-height: 100vh;
 
   background-color: var(--CURSOR-white);
 }
@@ -50,8 +51,18 @@ h3 {
 input,
 label,
 p,
-span {
+span,
+textarea {
   font-family: "IBM Plex Sans";
+}
+
+table, caption, tbody, tfoot, thead, tr, th, td {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
 }
 
 .no-spinners {

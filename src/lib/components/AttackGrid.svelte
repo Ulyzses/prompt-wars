@@ -3,17 +3,33 @@
   import { opponents } from "$lib/stores";
 
   export let error: string;
+
+  $: console.log($opponents);
 </script>
-<div class="grid-container">
-  {#each Array(6) as _, i}
-    <AttackBox opponent={$opponents[i]} bind:error />
+<table class="grid-container">
+  {#each Array(3) as _, row}
+    <tr class="grid-row">
+      {#each Array(3) as _, col}
+        <td class="grid-cell">
+          <AttackBox opponent={$opponents[3 * row + col]} bind:error />
+        </td>
+      {/each}
+    </tr>
   {/each}
-</div>
+</table>
 <style>
   .grid-container {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(3, 1fr);
-    gap: var(--space-xs);
+    border-spacing: var(--space-xs);
+    table-layout: fixed;
+    width: 100%;
+  }
+
+  .grid-row {
+    height: calc(100% / 3);
+  }
+
+  .grid-cell {
+    width: calc(100% / 3);
+    max-height: 100%;
   }
 </style>

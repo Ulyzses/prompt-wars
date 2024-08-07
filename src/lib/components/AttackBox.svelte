@@ -54,9 +54,12 @@
       const data = await response.json();
       const { correct } = data;
 
-      status = correct
-        ? `You got the password: ${password}`
-        : `The submitted password is wrong`;
+      if (correct) {
+        completion = `You got the password: ${password}`;
+        isSolved = true;
+      } else {
+        completion = "The submitted password is wrong";
+      }
     } catch (e) {
       error = e as string;
     }
@@ -66,13 +69,13 @@
   let completion = "";
   let cooldown = 0;
   let password = "";
-  let status = "";
+  let isSolved = false;
 
   $: isDisabled = cooldown > 0;
 </script>
 
-<div class="card">
-  {#if opponent}
+{#if opponent}
+  <div class="card">
     <h3>{opponent.name}</h3>
     <textarea
       placeholder="Chat completions go here"
@@ -81,50 +84,63 @@
       bind:value={completion}
       disabled
     ></textarea>
-    <div class="section-prompt">
-      <textarea
+    <textarea
       placeholder="Attack here"
       id="prompt"
       name="attack" 
       rows="3"
       bind:value={attack}
-      ></textarea>
+      disabled={isSolved}
+    ></textarea>
+    <input type="text" placeholder="Password" name="password" bind:value={password} disabled={isSolved} />
+    <div class="section-buttons">
       <button
         type="submit"
         on:click|preventDefault={sendAttack}
-        disabled={isDisabled}
+        disabled={isDisabled || isSolved}
         >Submit Prompt{isDisabled ? ` (in ${cooldown.toFixed(1)}s)` : ""}</button
       >
+      <button type="submit" on:click|preventDefault={verifyPassword} disabled={isSolved}>Verify Password</button>
     </div>
-    <div class="section-password">
-      <input type="text" placeholder="Password" name="password" bind:value={password} />
-      <button type="submit" on:click|preventDefault={verifyPassword}>Verify</button>
-    </div>
-    {#if status}
-      <p>{status}</p>
-    {/if}
-  {/if}
-</div>
+  </div>
+{/if}
 <style>
   .card {
     background-color: white;
     border-radius: var(--space-s);
     box-shadow: #ddd 0 0 var(--space-m);
     padding: var(--space-s);
-    max-width: 100%;
-  }
-
-  .section-prompt {
+    overflow: hidden;
+    height: 100%;
     width: 100%;
   }
 
   textarea {
+    width: 100%;
     padding: var(--space-xs);
     resize: none;
+  }
+
+  input {
+    margin-bottom: var(--space-xs);
+    max-width: var(--width-xxs);
+    padding: var(--space-xxs);
+    text-align: center;
+    width: 100%;
   }
   
   #completion {
     background-color: var(--CURSOR-white);
     width: 100%;
+  }
+
+  .section-buttons {
+    width: 100%;
+    display: flex;
+  }
+
+  button {
+    padding: var(--space-xxs);
+    flex-grow: 1;
   }
 </style>
