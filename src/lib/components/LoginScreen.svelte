@@ -14,16 +14,23 @@
 <div class="main-container">
   <form on:submit|preventDefault class="login-form">
     <h1 class="title">Prompt Wars</h1>
-    <input
-      type="text"
+    <select
       name="name"
-      minlength="3"
-      maxlength="16"
-      placeholder="Name"
       class="form-control"
       bind:value={playerName}
       required
-    />
+    >
+      <option value="">Select your team</option>
+      <option value="Knave of Hearts">Knave of Hearts</option>
+      <option value="White Rabbit">White Rabbit</option>
+      <option value="Mallymkun (Dormouse)">Mallymkun (Dormouse)</option>
+      <option value="Tweedle Dee">Tweedle Dee</option>
+      <option value="Tweedle Dum">Tweedle Dum</option>
+      <option value="Mad Hatter">Mad Hatter</option>
+      <option value="Cheshire Cat">Cheshire Cat</option>
+      <option value="Thackery Earwicket (March Hare)">Thackery Earwicket (March Hare)</option>
+      <option value="Caterpillar">Caterpillar</option>
+    </select>
     <input
       type="number"
       name="sessionId"
